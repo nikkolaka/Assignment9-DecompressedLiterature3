@@ -1,0 +1,2 @@
+This linked list should have
+20 items on the list poop

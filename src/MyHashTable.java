@@ -63,7 +63,7 @@ public class MyHashTable <Key extends Comparable<Key>, Value>{
 
     public void put(Key key, Value value){
         Integer hashTemp = hash(key);
-        keys.insert(key, keys.size());
+
         boolean secondPass = false;
 
         Integer tempProbe = 0;
@@ -84,7 +84,7 @@ public class MyHashTable <Key extends Comparable<Key>, Value>{
             }
             comparisons++;
             if(keyBuckets[i] == null){
-
+                keys.insert(key, keys.size());
                 keyBuckets[i] = key;
                 valueBuckets[i] = value;
                 size++;
@@ -113,18 +113,21 @@ public class MyHashTable <Key extends Comparable<Key>, Value>{
 
     public String toString(){
         StringBuilder str = new StringBuilder();
-
+        str.append("[");
         for (int i = 0; i < capacity; i++) {
 
-            if(keyBuckets[i] != null){
 
-                if(i == 0){
-                    str.append("[").append(keyBuckets[i]).append(":").append(valueBuckets[i]);
+
+            if(keyBuckets[i] != null){
+                if(str.length() == 1){
+                    str.append(keyBuckets[i]).append(":").append(valueBuckets[i]);
                 } else{
-                    str.append(", ").append(keyBuckets[i]).append(":").append(valueBuckets[i]);
+                    str.append(",").append(keyBuckets[i]).append(":").append(valueBuckets[i]);
                 }
 
             }
+
+
 
 
         }

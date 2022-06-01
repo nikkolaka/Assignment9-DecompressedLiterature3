@@ -5,7 +5,7 @@ import java.io.IOException;
 
 public class BookReader {
     String book;
-    MyLinkedList<String> words = new MyLinkedList<>();
+
     MyLinkedList<String> wordsAndSeparators = new MyLinkedList<>();
 
 
@@ -50,13 +50,11 @@ public class BookReader {
                 } else if(str.length() != 0){
                     wordsAndSeparators.addBefore(str.toString());
                     str.setLength(0);
+                    wordsAndSeparators.addBefore(ch.toString());
                 } else{
                     wordsAndSeparators.addBefore(ch.toString());
                 }
-                if(i == book.length()){
-                    System.out.println(str.toString());
-                    wordsAndSeparators.addBefore(str.toString());
-                }
+
 
 
 

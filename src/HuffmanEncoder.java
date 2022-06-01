@@ -14,7 +14,7 @@ public class HuffmanEncoder {
     private byte[] encodedText;
     private boolean wordCodes = true;
     private MyHashTable<String, Integer> frequenciesHash = new MyHashTable<>(32768);
-    private MyHashTable<String, Integer> codesHash = new MyHashTable<>(32768);
+    private MyHashTable<String, String> codesHash =  new MyHashTable<>(32768);
 
 
 
@@ -26,29 +26,27 @@ public class HuffmanEncoder {
     writeFiles();
     }
     private void countFrequency(){
-    //This method counts the frequency of each character in the book and stores it in frequencies.
-    //Iterate through the text character by character maintaining counts in frequencies.
-    //The counts are stored in FrequencyNodes.
-    //It should output the time it takes to count the frequencies
+
         long duration = 0;
         long start = System.currentTimeMillis();
 
-        for (int i = 0; i < book.book.length(); i++) {
-            FrequencyNode ch = new FrequencyNode();
-            ch.character = book.book.charAt(i);
-            ch.count = 1;
-            if(frequencies.binarySearch(ch) != null){
-                ch.count += frequencies.remove(ch).count;
-                frequencies.add(ch);
+        for(book.wordsAndSeparators.first(); book.wordsAndSeparators.current() != null; book.wordsAndSeparators.next()) {
+
+            String word = book.wordsAndSeparators.current();
+
+
+            if(frequenciesHash.get(word) != null){
+                int count = frequenciesHash.get(word) + 1;
+                frequenciesHash.put(word, count);
 
             } else{
-                frequencies.add(ch);
+                frequenciesHash.put(word, 1);
             }
         }
 
         long now = System.currentTimeMillis();
         duration = now - start;
-        System.out.println("It took "+duration+" ms to count frequency of "+frequencies.size()+" characters");
+        System.out.println("It took "+duration+" ms to count frequency of "+frequenciesHash.size()+" characters");
         System.out.println();
     }
     private void buildTree(){
@@ -64,14 +62,18 @@ public class HuffmanEncoder {
         long duration = 0;
         long start = System.currentTimeMillis();
         MyPriorityQueue<HuffManNode> tree = new MyPriorityQueue<>();
-        for (int i = 0; i < frequencies.size(); i++) {
-            HuffManNode node = new HuffManNode(frequencies.get(i).character, frequencies.get(i).count);
+
+
+
+        for (int i = 0; i < frequenciesHash.keys.size(); i++) {
+            HuffManNode node = new HuffManNode(frequenciesHash.keys.get(i), frequenciesHash.get(frequenciesHash.keys.get(i)));
             tree.insert(node);
         }
         while(tree.size()>1) {
             HuffManNode node = new HuffManNode(tree.removeMin(), tree.removeMin());
             tree.insert(node);
         }
+
         huffmanTree = tree.removeMin();
 
         extractCode(huffmanTree,"");
@@ -79,6 +81,7 @@ public class HuffmanEncoder {
         duration = now - start;
         System.out.println("Built Huffman tree in "+duration+" ms");
         System.out.println();
+
 
 
     }
@@ -96,12 +99,10 @@ public class HuffmanEncoder {
             extractCode(root.right, code);
             code = code.substring(0, code.length() - 1);
         }
-        if(root.character != null){
-            CodeNode node = new CodeNode();
-            node.character = root.character;
-            node.code = code;
-            codes.add(node);
+        if(root.word != null){
+            codesHash.put(root.word, code);
         }
+
 
 
 
@@ -116,11 +117,9 @@ public class HuffmanEncoder {
         long duration = 0;
         long start = System.currentTimeMillis();
         StringBuilder str = new StringBuilder();
-        for (int i = 0; i < book.book.length(); i++) {
+        for(book.wordsAndSeparators.first(); book.wordsAndSeparators.current() != null; book.wordsAndSeparators.next()) {
 
-            CodeNode temp = new CodeNode();
-            temp.character = book.book.charAt(i);
-            str.append(codes.binarySearch(temp).code);
+            str.append(codesHash.get(book.wordsAndSeparators.current()));
         }
         encodedText = new byte[(int) Math.ceil(((double) str.length())/8)];
         String string = "";
@@ -161,8 +160,8 @@ public class HuffmanEncoder {
             fos.write(encodedText);
         }
         try (FileWriter writer = new FileWriter(codesFileName)) {
-            for (int i = 0; i < codes.size(); i++) {
-                writer.write(codes.get(i).toString()+"\n");
+            for (int i = 0; i < codesHash.size(); i++) {
+                writer.write(codesHash.get(codesHash.keys.get(i))+"\n");
             }
         }
         long now = System.currentTimeMillis();
@@ -171,7 +170,7 @@ public class HuffmanEncoder {
 
     }
 
-    class FrequencyNode implements Comparable<FrequencyNode>{
+/*    class FrequencyNode implements Comparable<FrequencyNode>{
         Character character;
         Integer count = 0;
 
@@ -184,15 +183,16 @@ public class HuffmanEncoder {
 
 
 
-    }
+    }*/
     class HuffManNode implements Comparable<HuffManNode>{
-        Character character;
+
         Integer weight;
         HuffManNode left;
         HuffManNode right;
+        String word;
 
-        public HuffManNode(Character ch, Integer wt){
-            this.character = ch;
+        public HuffManNode(String word, Integer wt){
+            this.word = word;
             this.weight = wt;
         }
         public HuffManNode(HuffManNode left, HuffManNode right){
@@ -205,10 +205,10 @@ public class HuffmanEncoder {
             return this.weight.compareTo(other.weight);
         }
         public String toString(){
-            return character+":"+weight;
+            return word+":"+weight;
         }
     }
-    class CodeNode implements Comparable<CodeNode>{
+    /*class CodeNode implements Comparable<CodeNode>{
         Character character;
         String code;
         public int compareTo(CodeNode other){
@@ -217,7 +217,7 @@ public class HuffmanEncoder {
         public String toString(){
             return character+":"+code;
         }
-    }
+    }*/
 
 }
 
